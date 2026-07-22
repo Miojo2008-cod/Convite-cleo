@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Convite - Deja</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Permanent+Marker&family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* ===== Y2K palette =====
+       pink        - primary hot pink, the CD-case pink from the moodboard
+       pink-deep   - shadows / pressed states
+       grape       - the deep magenta the gradients sink into
+       cyan        - gadget-screen accent (gameboy / boombox glow)
+       lime        - the neon green from the graphic tee
+       gold        - holographic foil accent
+       cream       - paper/card base so photos still read clearly
+    */
+    --pink:#ff2f8b;
+    --pink-deep:#b8115c;
+    --grape:#5a1240;
+    --cyan:#37e6ff;
+    --lime:#c6ff3d;
+    --gold:#ffd23f;
+    --cream:#fdeaf3;
+
+    --font-display:'Baloo 2', sans-serif;
+    --font-script:'Permanent Marker', cursive;
+    --font-pixel:'Press Start 2P', monospace;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{
+    margin:0; padding:0; height:100%;
+    font-family:var(--font-display);
+    background:#170710;
+    overflow:hidden;
+  }
+  body{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; }
+  }
+  .stage{
+    position:relative;
+    width:100vw;
+    height:100vh;
+    height:100dvh;
+    overflow:hidden;
+    background:var(--cream);
+    box-shadow:0 0 60px rgba(0,0,0,0.6);
+    transition:width .3s ease, height .3s ease;
+  }
+  @media (min-width:640px){
+    body{
+      background:
+        radial-gradient(circle at 50% 10%, rgba(255,255,255,.25), transparent 45%),
+        radial-gradient(circle at 50% 15%, var(--gold) 0%, var(--pink) 45%, var(--grape) 100%);
+    }
+    .stage{
+      width:min(92vw, 440px);
+      height:min(92vh, 880px);
+      border-radius:32px;
+      box-shadow:0 30px 80px rgba(0,0,0,0.55), 0 0 0 6px rgba(255,255,255,0.25);
+    }
+    .frame{ border-radius:20px !important; }
+  }
+
+  .frame-holder{
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--cream);
+  }
+  .frame{
+    position:relative;
+    width:94%;
+    max-width:420px;
+    aspect-ratio:750/1333;
+    margin:0 auto;
+    border-radius:14px;
+    overflow:hidden;
+    box-shadow:0 14px 34px rgba(120,20,70,0.28), 0 0 0 3px rgba(255,255,255,.6);
+  }
+  .frame img.bg{
+    position:absolute; inset:0;
+    width:100%; height:100%;
+    object-fit:cover;
+    display:block;
+  }
+  #sec-hero .frame, #sec-details .frame, #sec-playlist .frame{
+    animation:frameFloat 5.5s ease-in-out infinite;
+  }
+  @keyframes frameFloat{
+    0%,100%{ transform:translateY(0) rotate(0deg); }
+    50%{ transform:translateY(-9px) rotate(-.4deg); }
+  }
+
+  /* holographic foil text - the site's signature flourish, used sparingly */
+  .glitter-text{
+    font-family:var(--font-script);
+    font-weight:400;
+    letter-spacing:.5px;
+    background:linear-gradient(115deg, #fff 0%, var(--gold) 22%, var(--pink) 45%, var(--cyan) 68%, #fff 100%);
+    background-size:250% 250%;
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    animation:shimmer 5s linear infinite;
+    filter:drop-shadow(0 3px 6px rgba(0,0,0,.28));
+  }
+  @keyframes shimmer{
+    0%{ background-position:0% 50%; }
+    100%{ background-position:250% 50%; }
+  }
+
+  .floaty{
+    position:absolute;
+    pointer-events:none;
+    font-size:22px;
+    opacity:.65;
+    animation:floaty 6s ease-in-out infinite;
+    filter:drop-shadow(0 4px 6px rgba(0,0,0,.2));
+    z-index:1;
+  }
+  @keyframes floaty{
+    0%,100%{ transform:translateY(0) rotate(0deg); }
+    50%{ transform:translateY(-18px) rotate(10deg); }
+  }
+
+  /* =========================================================
+     ENVELOPE SCENE
+  ==========================================================*/
+  #envelope-scene{
+    position:absolute; inset:0;
+    z-index:50;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    background:radial-gradient(circle at 50% 30%, #ffd9ec 0%, var(--cream) 70%);
+    transition:opacity .7s ease, visibility .7s ease;
+    gap:14px;
+    padding:20px 0;
+  }
+  #envelope-scene.done{ opacity:0; visibility:hidden; pointer-events:none; }
+  #envelope-scene .frame{
+    box-shadow:0 0 0 3px rgba(255,255,255,.7), 0 0 34px rgba(255,47,139,.45);
+    cursor:pointer;
+    animation:envGlow 2.2s ease-in-out infinite;
+  }
+  @keyframes envGlow{
+    0%,100%{ box-shadow:0 0 0 3px rgba(255,255,255,.7), 0 0 24px rgba(255,47,139,.35); }
+    50%{ box-shadow:0 0 0 3px rgba(255,255,255,.9), 0 0 42px rgba(255,47,139,.65); }
+  }
+  #envelope-scene .frame img.bg{ pointer-events:none; }
+
+  .env-hotspot{
+    position:absolute;
+    left:12.67%; top:35.86%;
+    width:74.67%; height:28.28%;
+    perspective:1400px;
+    z-index:5;
+  }
+  .env-body{ clip-path:inset(47% 0 0 0); z-index:2; }
+  .env-flap{
+    clip-path:inset(0 0 53% 0);
+    transform-origin:top center;
+    transform-style:preserve-3d;
+    z-index:4;
+    transition:transform .9s cubic-bezier(.34,1.56,.34,1);
+    filter:drop-shadow(0 6px 10px rgba(0,0,0,0.18));
+  }
+  .env-hotspot.opening .env-flap{ transform:rotateX(-130deg); }
+
+  .env-hint{
+    color:var(--pink-deep);
+    letter-spacing:2.5px;
+    font-size:10.5px;
+    text-transform:uppercase;
+    font-family:var(--font-pixel);
+    opacity:.9;
+    animation:pulse 1.8s ease-in-out infinite;
+    text-align:center;
+  }
+  @keyframes pulse{ 0%,100%{opacity:.45;} 50%{opacity:1;} }
+  .env-music{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    color:#fff;
+    background:linear-gradient(90deg, var(--pink), var(--pink-deep));
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:11.5px;
+    letter-spacing:.5px;
+    text-decoration:none;
+    padding:9px 18px;
+    border-radius:20px;
+    box-shadow:0 8px 18px rgba(184,17,92,.35);
+  }
+
+  .confetti{ position:absolute; inset:0; pointer-events:none; z-index:60; opacity:0; }
+  .confetti.show{ opacity:1; }
+  .dot{ position:absolute; width:9px; height:9px; top:-10px; animation:fall 1.7s ease-in forwards; }
+  .dot.shape-star{ font-size:16px; width:auto; height:auto; line-height:1; }
+  .dot.shape-circle{ border-radius:50%; }
+  @keyframes fall{ to{ transform:translateY(115vh) rotate(420deg); opacity:0; } }
+
+  /* =========================================================
+     SITE
+  ==========================================================*/
+  #site{
+    position:absolute; inset:0;
+    overflow-y:auto; overflow-x:hidden;
+    scroll-snap-type:y mandatory;
+    scroll-behavior:smooth;
+  }
+  #site::-webkit-scrollbar{ display:none; }
+  section{
+    position:relative; width:100%;
+    height:100vh; height:100dvh;
+    scroll-snap-align:start;
+    display:flex; align-items:center; justify-content:center;
+    overflow:hidden;
+  }
+  /* signature scroll-in: soft rise + a single diagonal shine sweep, once per section */
+  .reveal{ opacity:0; transform:translateY(26px) scale(.97); transition:opacity .7s ease, transform .7s cubic-bezier(.2,.8,.2,1); }
+  section.in-view .reveal{ opacity:1; transform:translateY(0) scale(1); }
+  .reveal:nth-child(1){transition-delay:.05s;}
+  .reveal:nth-child(2){transition-delay:.16s;}
+  .reveal:nth-child(3){transition-delay:.27s;}
+  .reveal:nth-child(4){transition-delay:.38s;}
+
+  section .frame::after{
+    content:'';
+    position:absolute; inset:0;
+    background:linear-gradient(115deg, transparent 40%, rgba(255,255,255,.55) 50%, transparent 60%);
+    transform:translateX(-140%);
+    pointer-events:none;
+  }
+  section.in-view .frame::after{
+    animation:shine 1.1s ease-out .15s 1;
+  }
+  @keyframes shine{
+    to{ transform:translateX(140%); }
+  }
+
+  #dotnav{
+    position:absolute; right:12px; top:50%; transform:translateY(-50%);
+    z-index:40; display:flex; flex-direction:column; gap:11px;
+  }
+  #dotnav button{
+    width:9px; height:9px;
+    border-radius:2px;
+    border:1.5px solid var(--pink-deep); background:transparent;
+    padding:0; cursor:pointer; opacity:.55; transition:all .3s ease;
+    transform:rotate(45deg);
+  }
+  #dotnav button.active{ background:var(--pink-deep); width:11px; height:11px; opacity:1; }
+  #dotnav.on-dark button{ border-color:#fff; }
+  #dotnav.on-dark button.active{ background:#fff; }
+
+  /* ---------- HERO ---------- */
+  #sec-hero{ background:linear-gradient(180deg, var(--cream), #ffd0e6); }
+  .hero-icons{ position:absolute; inset:0; }
+  .icon-btn{
+    position:absolute;
+    width:12.4%; height:6.9%;
+    border-radius:50%;
+    border:none;
+    background:transparent;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+  }
+  .icon-btn svg{ width:44%; height:44%; color:#fff; filter:drop-shadow(0 1px 2px rgba(0,0,0,.25)); transition:transform .25s ease; }
+  .icon-btn:active svg{ transform:scale(.82); }
+  @media (hover:hover){ .icon-btn:hover svg{ transform:scale(1.15); } }
+  .icon-loc{ left:26.0%; top:68.6%; transform:translate(-50%,-50%); }
+  .icon-rsvp{ left:46.9%; top:68.6%; transform:translate(-50%,-50%); }
+  .icon-wpp{ left:67.3%; top:68.6%; transform:translate(-50%,-50%); }
+
+  .scroll-cue{
+    position:absolute; bottom:14px; left:50%; transform:translateX(-50%);
+    color:var(--pink-deep);
+    font-family:var(--font-pixel);
+    font-size:9px; letter-spacing:1.5px; text-transform:uppercase;
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+    animation:bob 1.8s ease-in-out infinite; z-index:2;
+  }
+  @keyframes bob{ 0%,100%{transform:translate(-50%,0);} 50%{transform:translate(-50%,8px);} }
+  .scroll-cue svg{ width:15px; height:15px; }
+
+  /* ---------- COUNTDOWN (retro LCD boombox display) ---------- */
+  #sec-countdown{
+    background:
+      repeating-linear-gradient(0deg, rgba(255,255,255,.035) 0 2px, transparent 2px 4px),
+      radial-gradient(circle at 50% 0%, #7a1a55 0%, var(--pink-deep) 50%, var(--grape) 100%);
+    flex-direction:column; text-align:center; padding:0 26px;
+  }
+  .cd-eyebrow{ color:var(--lime); font-family:var(--font-pixel); letter-spacing:2px; text-transform:uppercase; font-size:9px; margin-bottom:14px; }
+  .cd-title{ font-size:34px; margin:0 0 30px; }
+  .cd-grid{ display:flex; gap:10px; justify-content:center; margin-bottom:26px; }
+  .cd-box{
+    background:#14261b;
+    border:2px solid #2c4a37;
+    border-radius:8px; width:64px; padding:12px 0 10px;
+    box-shadow:inset 0 0 10px rgba(0,0,0,.6), 0 4px 0 rgba(0,0,0,.25);
+    animation:cdPulse 3.2s ease-in-out infinite;
+  }
+  .cd-box:nth-child(2){ animation-delay:.15s; }
+  .cd-box:nth-child(3){ animation-delay:.3s; }
+  .cd-box:nth-child(4){ animation-delay:.45s; }
+  @keyframes cdPulse{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-5px); } }
+  .cd-num{ color:var(--lime); font-size:22px; font-weight:700; font-family:var(--font-pixel); line-height:1; text-shadow:0 0 8px rgba(198,255,61,.75); }
+  .cd-label{ color:var(--lime); font-size:8px; letter-spacing:1px; text-transform:uppercase; margin-top:8px; font-family:var(--font-pixel); opacity:.75; }
+  .cd-sub{ color:#fff; font-family:var(--font-display); font-weight:600; font-size:14px; line-height:1.7; opacity:.95; }
+  .cd-sub b{ display:block; font-size:18px; letter-spacing:.5px; font-weight:800; color:var(--gold); }
+
+  /* ---------- DETAILS ---------- */
+  #sec-details{ background:linear-gradient(180deg, #ffd0e6, var(--cream)); }
+
+  /* ---------- PLAYLIST (QR mixtape card) ---------- */
+  #sec-playlist{ background:linear-gradient(180deg, var(--cream), #ffd7c9); }
+  .playlist-cta{
+    margin-top:14px;
+    display:inline-flex; align-items:center; gap:8px;
+    background:linear-gradient(90deg, var(--pink), var(--pink-deep));
+    color:#fff; text-decoration:none;
+    font-family:var(--font-display); font-weight:700;
+    font-size:11.5px; letter-spacing:.5px; text-transform:uppercase;
+    padding:12px 22px; border-radius:30px;
+    box-shadow:0 10px 22px rgba(184,17,92,.35);
+  }
+
+  /* ---------- RSVP ---------- */
+  #sec-rsvp{
+    background:linear-gradient(180deg, var(--cream) 0%, #ffd7c9 55%, var(--pink) 100%);
+    flex-direction:column; padding:34px 28px; text-align:center;
+  }
+  .rsvp-eyebrow{ color:var(--pink-deep); font-family:var(--font-pixel); letter-spacing:2px; text-transform:uppercase; font-size:9px; margin-bottom:10px; }
+  .rsvp-title{ font-size:32px; margin:0 0 18px; }
+  #rsvpName{ width:100%; max-width:280px; padding:13px 18px; border-radius:30px; border:2px solid var(--pink); background:#fff; font-family:var(--font-display); font-weight:600; font-size:14px; color:var(--pink-deep); outline:none; margin-bottom:18px; }
+  #rsvpName::placeholder{ color:#e59fc0; }
+  .rsvp-choices{ display:flex; flex-direction:column; gap:10px; width:100%; max-width:280px; margin-bottom:16px; }
+  .rsvp-choice{
+    display:flex; align-items:center; justify-content:center;
+    border:none; cursor:pointer; text-decoration:none;
+    font-family:var(--font-display); font-weight:800; letter-spacing:.3px;
+    font-size:14.5px; padding:15px 20px; border-radius:30px;
+    transition:transform .15s ease;
+  }
+  .rsvp-choice:active{ transform:scale(.96); }
+  .rsvp-choice.yes{ background:linear-gradient(90deg, var(--pink), var(--pink-deep)); color:#fff; box-shadow:0 10px 22px rgba(184,17,92,.35); }
+  .rsvp-choice.no{ background:#fff; color:var(--pink-deep); border:2px solid var(--pink); }
+  .btn-outline{ display:inline-flex; align-items:center; gap:8px; background:transparent; color:var(--pink-deep); border:2px solid var(--pink-deep); font-family:var(--font-display); font-weight:700; letter-spacing:.5px; text-transform:uppercase; font-size:11px; padding:12px 24px; border-radius:30px; cursor:pointer; text-decoration:none; }
+  .rsvp-footer{ margin-top:22px; color:#8a2a55; font-size:12.5px; font-family:var(--font-display); font-weight:600; line-height:1.6; }
+  .rsvp-footer .sig{ display:block; margin-top:4px; font-size:26px; }
+  .divider{ width:40px; height:3px; background:var(--gold); margin:0 auto 20px; border-radius:2px; }
+
+  .sr-only{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); }
+
+  /* ---------- BACK BUTTONS ---------- */
+  .back-btn{
+    position:absolute;
+    top:18px; left:18px;
+    z-index:25;
+    width:38px; height:38px;
+    border-radius:50%;
+    border:none;
+    background:rgba(255,255,255,0.92);
+    color:var(--pink-deep);
+    font-size:18px;
+    line-height:1;
+    cursor:pointer;
+    box-shadow:0 4px 14px rgba(0,0,0,0.22);
+    display:flex; align-items:center; justify-content:center;
+    transition:transform .18s ease;
+  }
+  .back-btn:active{ transform:scale(.88); }
+
+  /* ---------- MUSIC TOGGLE (holographic CD) ---------- */
+  .music-btn{
+    position:absolute;
+    bottom:18px; right:16px;
+    z-index:90;
+    width:48px; height:48px;
+    border-radius:50%;
+    border:2px solid rgba(255,255,255,.8);
+    background:
+      radial-gradient(circle at center, #fff 0 6%, transparent 7% 8%),
+      conic-gradient(from 0deg, #ff2f8b, #ffd23f, #37e6ff, #c6ff3d, #ff2f8b);
+    cursor:pointer;
+    box-shadow:0 6px 18px rgba(0,0,0,0.32);
+    animation:musicSpin 5s linear infinite;
+  }
+  .music-btn.paused{ animation-play-state:paused; opacity:.6; }
+  @keyframes musicSpin{ from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
+</style>
+</head>
+<body>
+
+<div class="stage" id="stage">
+
+  <!-- ================= ENVELOPE ================= -->
+  <div id="envelope-scene">
+    <div class="frame" id="envFrame" role="button" tabindex="0" aria-label="Abrir convite">
+      <img class="bg" src="phone.jpg" alt="Envelope decorado com flor de hibisco">
+      <div class="env-hotspot" id="envHotspot">
+        <div class="env-layer env-body"></div>
+        <div class="env-layer env-flap"></div>
+      </div>
+      <div class="env-card" id="envCard"></div>
+    </div>
+    <span class="floaty" style="top:8%; left:10%; animation-duration:5.5s;">💿</span>
+    <span class="floaty" style="top:12%; right:8%; animation-duration:7s; animation-delay:.6s;">✨</span>
+    <span class="floaty" style="bottom:18%; left:14%; animation-duration:6.5s; animation-delay:1.1s;">⭐</span>
+    <div class="env-hint">toque no Nokia</div>
+    <a class="env-music" href="https://open.spotify.com/playlist/4xX35tce4XP8g2Hircsv5q?si=P8XXtcFEQui2VGDnMhD5iA&utm_source=instagram-direct-message&pi=BTV2a2Y-R8mWZ" target="_blank" rel="noopener">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm4.4 14.4a.6.6 0 0 1-.83.2c-2.3-1.4-5.2-1.7-8.6-.9a.6.6 0 1 1-.27-1.17c3.7-.85 6.9-.48 9.5 1.1.29.17.38.55.2.87zm1.2-2.7a.75.75 0 0 1-1.03.25c-2.6-1.6-6.6-2.07-9.7-1.13a.75.75 0 1 1-.44-1.44c3.53-1.07 7.9-.54 10.9 1.3.35.22.47.68.27 1.02zm.1-2.8C14.9 9 8.9 8.8 5.9 9.7a.9.9 0 1 1-.52-1.72c3.5-1.05 10.1-.82 13.6 1.26a.9.9 0 1 1-.92 1.55z"/></svg>
+      nossa playlist
+    </a>
+    <div class="confetti" id="confetti"></div>
+  </div>
+
+  <!-- ================= SITE ================= -->
+  <div id="site">
+
+    <nav id="dotnav">
+      <button data-target="sec-hero" class="active" aria-label="Convite"></button>
+      <button data-target="sec-countdown" aria-label="Contagem"></button>
+      <button data-target="sec-details" aria-label="Detalhes"></button>
+      <button data-target="sec-playlist" aria-label="Playlist"></button>
+      <button data-target="sec-rsvp" aria-label="Confirmação"></button>
+    </nav>
+
+    <section id="sec-hero">
+      <div class="frame-holder">
+        <div class="frame">
+          <img class="bg" src="inicial.jpg" alt="Convite de aniversário de 18 anos da Agatha">
+          <div class="hero-icons">
+            <a class="icon-btn icon-loc" href="https://maps.app.goo.gl/3pc9AATg998PCEuw7" target="_blank" rel="noopener" title="Local da festa">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 21s-7-6.1-7-11a7 7 0 0 1 14 0c0 4.9-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+              <span class="sr-only">Local da festa</span>
+            </a>
+            <button class="icon-btn icon-rsvp" id="heroRsvpBtn" title="Confirmar presença">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="8" r="3.2"/><path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6"/><path d="M12 14.5v2.3M12 19.2h.01"/></svg>
+              <span class="sr-only">Informações</span>
+            </button>
+            <a class="icon-btn icon-wpp"href="#sec-rsvp" title="Confirmar presença">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2zm0 18.1a8 8 0 0 1-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1 1 12 20.1zm4.4-5.9c-.2-.1-1.4-.7-1.6-.8-.2-.1-.4-.1-.6.1s-.7.8-.8 1c-.2.2-.3.2-.5.1-1.4-.7-2.3-1.3-3.2-2.9-.2-.4.2-.4.6-1.2.1-.2 0-.4 0-.5S9.7 8 9.5 7.5c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.2-.9.9-.9 2.2s1 2.6 1.1 2.8c.1.2 2 3 4.8 4.2.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.4-.6 1.6-1.1.2-.5.2-1 .1-1.1-.1-.1-.3-.2-.5-.3z"/></svg>
+              <span class="sr-only">WhatsApp</span>
+            </a>
+          </div>
+          <div class="scroll-cue reveal">
+            <span>deslize</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="sec-countdown">
+      <button class="back-btn" data-prev="sec-hero" aria-label="Voltar">←</button>
+      <span class="floaty" style="top:10%; left:8%; animation-duration:5.8s;">✨</span>
+      <span class="floaty" style="bottom:12%; right:10%; animation-duration:6.6s; animation-delay:.8s;">⭐</span>
+      <div>
+        <div class="cd-eyebrow reveal">FALTAM APENAS</div>
+        <div class="cd-title reveal glitter-text">para a festa!</div>
+        <div class="cd-grid reveal">
+          <div class="cd-box"><div class="cd-num" id="cd-days">00</div><div class="cd-label">dias</div></div>
+          <div class="cd-box"><div class="cd-num" id="cd-hours">00</div><div class="cd-label">horas</div></div>
+          <div class="cd-box"><div class="cd-num" id="cd-min">00</div><div class="cd-label">min</div></div>
+          <div class="cd-box"><div class="cd-num" id="cd-sec">00</div><div class="cd-label">seg</div></div>
+        </div>
+        <div class="cd-sub reveal"><b>22 de agosto · 14h00</b>Vem comemorar comigo! 💖</div>
+      </div>
+    </section>
+
+    <section id="sec-details">
+      <button class="back-btn" data-prev="sec-countdown" aria-label="Voltar">←</button>
+      <div class="frame-holder">
+        <div class="frame">
+          <img class="bg" src="1.jpg" alt="Informações adicionais da festa">
+        </div>
+      </div>
+    </section>
+
+    <section id="sec-playlist">
+      <button class="back-btn" data-prev="sec-details" aria-label="Voltar">←</button>
+      <div class="frame-holder">
+        <div class="frame">
+          <img class="bg" src="n.jpg" alt="Escaneie o QR code para adicionar uma música na playlist da festa">
+        </div>
+      </div>
+      <a class="playlist-cta reveal" href="https://open.spotify.com/playlist/4xX35tce4XP8g2Hircsv5q?si=P8XXtcFEQui2VGDnMhD5iA&utm_source=instagram-direct-message&pi=BTV2a2Y-R8mWZ" target="_blank" rel="noopener" style="position:absolute; bottom:24px; left:50%; transform:translateX(-50%);">
+        abrir playlist
+      </a>
+    </section>
+
+    <section id="sec-rsvp">
+      <button class="back-btn" data-prev="sec-playlist" aria-label="Voltar">←</button>
+      <span class="floaty" style="top:9%; right:10%; animation-duration:6s;">💖</span>
+      <span class="floaty" style="bottom:8%; left:9%; animation-duration:7.2s; animation-delay:1s;">✨</span>
+      <div class="reveal rsvp-eyebrow">SUA PRESENÇA</div>
+      <div class="reveal rsvp-title glitter-text">é o meu presente!</div>
+      <div class="divider reveal"></div>
+      <input class="reveal" id="rsvpName" type="text" placeholder="Seu nome" autocomplete="off">
+      <div class="reveal rsvp-choices">
+        <a class="rsvp-choice yes" id="rsvpYes" href="#" target="_blank" rel="noopener">Sim, vou! 🎉</a>
+        <a class="rsvp-choice no" id="rsvpNo" href="#" target="_blank" rel="noopener">Não vou poder 😢</a>
+      </div>
+      <a class="reveal btn-outline" href="https://maps.app.goo.gl/3pc9AATg998PCEuw7" target="_blank" rel="noopener">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.1-7-11a7 7 0 0 1 14 0c0 4.9-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+        Ver localização
+      </a>
+      <div class="reveal rsvp-footer">
+        Com carinho,
+        <span class="sig glitter-text">Di</span>
+      </div>
+    </section>
+
+  </div>
+
+  <!--
+    ======================================================================
+    🎵 MÚSICA DE FUNDO (via YouTube, sem precisar baixar nada):
+    1) Ache o vídeo/música no YouTube e copie o link, ex:
+       https://www.youtube.com/watch?v=dQw4w9WgXcQ
+    2) Pegue só o código depois de "v=" (no exemplo acima: dQw4w9WgXcQ).
+    3) Cole esse código no lugar de "SEU_VIDEO_ID_AQUI" logo abaixo,
+       nas DUAS linhas onde ele aparece (videoId e playlist).
+    Obs: alguns vídeos têm a incorporação bloqueada pelo dono do canal;
+    se a música não tocar, tente outro vídeo/link.
+    ======================================================================
+  !-->
+
+<audio id="bgMusic" loop>
+    <source src="ssstik.io_1784739881474.mp3" type="audio/mpeg">
+</audio>
+
+<button id="musicToggle" class="music-btn" aria-label="Ligar ou pausar a música"></button>
+  /* ---------- ENVELOPE OPEN ---------- */
+  <script>
+  const envFrame = document.getElementById('envFrame');
+  const envHotspot = document.getElementById('envHotspot');
+  const envelopeScene = document.getElementById('envelope-scene');
+  const confetti = document.getElementById('confetti');
+  const site = document.getElementById('site');
+  let opened = false;
+
+  function burstConfetti(){
+    confetti.innerHTML = '';
+    const colors = ['#ff2f8b','#ffd23f','#37e6ff','#c6ff3d','#fff'];
+    const shapes = ['circle','circle','circle','star'];
+    for(let i=0;i<30;i++){
+      const d = document.createElement('div');
+      const shape = shapes[Math.floor(Math.random()*shapes.length)];
+      d.className = 'dot shape-' + shape;
+      d.style.left = Math.random()*100+'%';
+      if(shape === 'star'){
+        d.textContent = '★';
+        d.style.color = colors[Math.floor(Math.random()*colors.length)];
+      } else {
+        d.style.background = colors[Math.floor(Math.random()*colors.length)];
+      }
+      d.style.animationDelay = (Math.random()*0.4)+'s';
+      d.style.animationDuration = (1.2+Math.random()*0.8)+'s';
+      confetti.appendChild(d);
+    }
+    confetti.classList.add('show');
+    setTimeout(()=>confetti.classList.remove('show'), 2200);
+  }
+
+  function openEnvelope(){
+    if(opened) return;
+    opened = true;
+    envHotspot.classList.add('opening');
+    envFrame.classList.add('opening');
+    burstConfetti();
+    startMusic();
+    setTimeout(()=>{
+      envelopeScene.classList.add('done');
+      site.scrollTo({top:0});
+    }, 1350);
+  }
+
+  /* ---------- BACK BUTTONS ---------- */
+  document.querySelectorAll('.back-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const prev = document.getElementById(btn.dataset.prev);
+      if(prev) prev.scrollIntoView({behavior:'smooth'});
+    });
+  });
+
+  /* ---------- BACKGROUND MUSIC (YouTube, escondido) ---------- */
+/* ---------- BACKGROUND MUSIC (MP3) ---------- */
+const music = document.getElementById('bgMusic');
+const musicToggle = document.getElementById('musicToggle');
+
+function startMusic(){
+    music.play().catch(() => {});
+}
+
+musicToggle.addEventListener('click', ()=>{
+    if(music.paused){
+        music.play();
+        musicToggle.classList.remove('paused');
+    }else{
+        music.pause();
+        musicToggle.classList.add('paused');
+    }
+});
+
+envFrame.addEventListener('click', openEnvelope);
+envFrame.addEventListener('keypress', e=>{
+    if(e.key==='Enter'||e.key===' ') openEnvelope();
+});
+
+  /* ---------- SCROLL REVEAL ---------- */
+  const sections = document.querySelectorAll('section');
+  const dots = document.querySelectorAll('#dotnav button');
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        entry.target.classList.add('in-view');
+        dots.forEach(d=>d.classList.toggle('active', d.dataset.target===entry.target.id));
+        document.getElementById('dotnav').classList.toggle('on-dark', entry.target.id==='sec-countdown');
+      } else {
+        entry.target.classList.remove('in-view');
+      }
+    });
+  }, {root:site, threshold:0.55});
+  sections.forEach(s=>io.observe(s));
+
+  dots.forEach(d=>{
+    d.addEventListener('click', ()=>{
+      document.getElementById(d.dataset.target).scrollIntoView({behavior:'smooth'});
+    });
+  });
+
+  document.getElementById('heroRsvpBtn').addEventListener('click', ()=>{
+  document.getElementById('sec-details').scrollIntoView({behavior:'smooth'});
+});
+
+  /* ---------- COUNTDOWN ---------- */
+  const target = new Date('2026-08-22T14:00:00');
+  function tick(){
+    const now = new Date();
+    let diff = target - now;
+    if(diff < 0) diff = 0;
+    const d = Math.floor(diff/86400000);
+    const h = Math.floor((diff%86400000)/3600000);
+    const m = Math.floor((diff%3600000)/60000);
+    const s = Math.floor((diff%60000)/1000);
+    document.getElementById('cd-days').textContent = String(d).padStart(2,'0');
+    document.getElementById('cd-hours').textContent = String(h).padStart(2,'0');
+    document.getElementById('cd-min').textContent = String(m).padStart(2,'0');
+    document.getElementById('cd-sec').textContent = String(s).padStart(2,'0');
+  }
+  tick();
+  setInterval(tick, 1000);
+
+  /* ---------- RSVP ----------
+     Cada botão já é a confirmação: um clique escolhe a resposta
+     e abre o WhatsApp direto com a mensagem certa. */
+  const rsvpName = document.getElementById('rsvpName');
+  const rsvpYes = document.getElementById('rsvpYes');
+  const rsvpNo = document.getElementById('rsvpNo');
+  const WHATSAPP_NUMBER = '5516988577884'; // <-- troque pelo número real (DDI+DDD+numero)
+
+  function buildLink(choice){
+    const name = rsvpName.value.trim() || 'convidado(a)';
+    const msg = choice === 'sim'
+      ? `Oii Di!! Eu ${name}. estou confirmada (o)!! Vamos comemorar juntos!!💓🎉 🎉💖`
+      : `Oi Di! Aqui é ${name}. Infelizmente não vou conseguir ir na sua festa dia 22/08, mas te desejo um dia incrível! 💕`;
+    return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+  }
+  function refreshLinks(){
+    rsvpYes.href = buildLink('sim');
+    rsvpNo.href = buildLink('nao');
+  }
+  rsvpName.addEventListener('input', refreshLinks);
+  refreshLinks();
+</script>
+</body>
+</html>
